@@ -36,7 +36,10 @@ public class MataKuliah implements Validatable {
     }
 
     public void setKode(String kode) {
-        this.kode = kode;
+        if (kode == null || !kode.trim().matches("^[A-Za-z]{2,4}[0-9]{3,4}$")) {
+            throw new IllegalArgumentException("Kode mata kuliah harus terdiri dari 2-4 huruf diikuti 3-4 angka (contoh: IF101).");
+        }
+        this.kode = kode.trim().toUpperCase();
     }
 
     public String getNama() {
@@ -44,7 +47,10 @@ public class MataKuliah implements Validatable {
     }
 
     public void setNama(String nama) {
-        this.nama = nama;
+        if (nama == null || nama.trim().length() < 2 || nama.trim().length() > 100) {
+            throw new IllegalArgumentException("Nama mata kuliah harus terdiri dari 2-100 karakter.");
+        }
+        this.nama = nama.trim();
     }
 
     public int getSks() {
@@ -52,6 +58,9 @@ public class MataKuliah implements Validatable {
     }
 
     public void setSks(int sks) {
+        if (sks < 1 || sks > 6) {
+            throw new IllegalArgumentException("SKS harus bernilai antara 1 dan 6.");
+        }
         this.sks = sks;
     }
 
@@ -60,6 +69,9 @@ public class MataKuliah implements Validatable {
     }
 
     public void setDosenId(int dosenId) {
+        if (dosenId <= 0) {
+            throw new IllegalArgumentException("Dosen pengampu wajib dipilih.");
+        }
         this.dosenId = dosenId;
     }
 
@@ -73,7 +85,14 @@ public class MataKuliah implements Validatable {
 
     @Override
     public void validasi() throws ValidasiException {
-        throw new UnsupportedOperationException();
+        try {
+            setKode(this.kode);
+            setNama(this.nama);
+            setSks(this.sks);
+            setDosenId(this.dosenId);
+        } catch (IllegalArgumentException e) {
+            throw new ValidasiException(e.getMessage(), e);
+        }
     }
 
     @Override
