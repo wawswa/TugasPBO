@@ -1,9 +1,9 @@
+agents.md
 target/
 data/
 *.db
 *.log
 *.class
-README.md
 
 # IDE
 .idea/
