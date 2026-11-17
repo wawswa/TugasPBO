@@ -39,7 +39,10 @@ public class Mahasiswa implements Validatable {
     }
 
     public void setNim(String nim) {
-        this.nim = nim;
+        if (nim == null || !nim.trim().matches("^\\d{5,15}$")) {
+            throw new IllegalArgumentException("NIM harus berupa 5-15 digit angka.");
+        }
+        this.nim = nim.trim();
     }
 
     public String getNama() {
@@ -47,7 +50,10 @@ public class Mahasiswa implements Validatable {
     }
 
     public void setNama(String nama) {
-        this.nama = nama;
+        if (nama == null || nama.trim().length() < 2 || nama.trim().length() > 100) {
+            throw new IllegalArgumentException("Nama harus terdiri dari 2-100 karakter.");
+        }
+        this.nama = nama.trim();
     }
 
     public String getJenisKelamin() {
@@ -55,7 +61,10 @@ public class Mahasiswa implements Validatable {
     }
 
     public void setJenisKelamin(String jenisKelamin) {
-        this.jenisKelamin = jenisKelamin;
+        if (jenisKelamin == null || (!jenisKelamin.trim().equalsIgnoreCase("L") && !jenisKelamin.trim().equalsIgnoreCase("P"))) {
+            throw new IllegalArgumentException("Jenis kelamin harus 'L' atau 'P'.");
+        }
+        this.jenisKelamin = jenisKelamin.trim().toUpperCase();
     }
 
     public LocalDate getTanggalLahir() {
@@ -63,6 +72,12 @@ public class Mahasiswa implements Validatable {
     }
 
     public void setTanggalLahir(LocalDate tanggalLahir) {
+        if (tanggalLahir == null) {
+            throw new IllegalArgumentException("Tanggal lahir tidak boleh kosong.");
+        }
+        if (tanggalLahir.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Tanggal lahir tidak boleh di masa depan.");
+        }
         this.tanggalLahir = tanggalLahir;
     }
 
@@ -71,12 +86,24 @@ public class Mahasiswa implements Validatable {
     }
 
     public void setAngkatan(int angkatan) {
+        int tahunSekarang = LocalDate.now().getYear();
+        if (angkatan < 2000 || angkatan > tahunSekarang) {
+            throw new IllegalArgumentException("Angkatan harus antara 2000 dan " + tahunSekarang + ".");
+        }
         this.angkatan = angkatan;
     }
 
     @Override
     public void validasi() throws ValidasiException {
-        throw new UnsupportedOperationException();
+        try {
+            setNim(this.nim);
+            setNama(this.nama);
+            setJenisKelamin(this.jenisKelamin);
+            setTanggalLahir(this.tanggalLahir);
+            setAngkatan(this.angkatan);
+        } catch (IllegalArgumentException e) {
+            throw new ValidasiException(e.getMessage(), e);
+        }
     }
 
     @Override
