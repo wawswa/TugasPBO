@@ -101,6 +101,22 @@ class AuthServiceTest {
     }
 
     @Test
+    void namaTidakValidDitolakSebagaiValidasiException() {
+        ValidasiException ex = assertThrows(ValidasiException.class, () ->
+                service.tambahDosen(admin, "A", "dosen3", "password123"));
+
+        assertTrue(ex.getMessage().contains("2-100"));
+    }
+
+    @Test
+    void usernameTidakValidDitolakSebagaiValidasiException() {
+        ValidasiException ex = assertThrows(ValidasiException.class, () ->
+                service.tambahDosen(admin, "Dosen Baru", "x", "password123"));
+
+        assertTrue(ex.getMessage().contains("3-30"));
+    }
+
+    @Test
     void loginBerhasilUntukAdminDanDosen() throws Exception {
         Dosen loginAdmin = service.login("admin", "admin123");
         assertNotNull(loginAdmin);

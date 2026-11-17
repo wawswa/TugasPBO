@@ -94,8 +94,7 @@ public class AuthService {
             throw new ValidasiException("Password minimal 6 karakter.");
         }
         String usernameBersih = username != null ? username.trim().toLowerCase() : "admin";
-        Dosen admin = new Dosen(0, nama, usernameBersih, sha256(password), Dosen.ROLE_ADMIN);
-        admin.validasi();
+        Dosen admin = buatDosen(0, nama, usernameBersih, sha256(password), Dosen.ROLE_ADMIN);
         dosenDAO.insert(admin);
         return dosenDAO.findByUsername(admin.getUsername());
     }
@@ -117,11 +116,23 @@ public class AuthService {
             throw new ValidasiException("Username '" + usernameBersih + "' sudah digunakan.");
         }
 
-        Dosen dosen = new Dosen(0, nama, usernameBersih, sha256(password), Dosen.ROLE_DOSEN);
-        dosen.validasi();
+        Dosen dosen = buatDosen(0, nama, usernameBersih, sha256(password), Dosen.ROLE_DOSEN);
 
         dosenDAO.insert(dosen);
         return dosenDAO.findByUsername(usernameBersih);
+    }
+
+    /**
+     * Membuat entitas dosen sekaligus menerjemahkan pelanggaran validasi model
+     * menjadi {@link ValidasiException} agar dapat ditampilkan oleh lapisan GUI.
+     */
+    private static Dosen buatDosen(int id, String nama, String username, String passwordHash, String role)
+            throws ValidasiException {
+        try {
+            return new Dosen(id, nama, username, passwordHash, role);
+        } catch (IllegalArgumentException e) {
+            throw new ValidasiException(e.getMessage(), e);
+        }
     }
 
     public static String sha256(String teks) {
