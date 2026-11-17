@@ -2,6 +2,10 @@ package id.ac.pbo.nilai.model;
 
 import java.util.List;
 
+/**
+ * Rincian kontribusi satu komponen pada rekap nilai seorang mahasiswa.
+ * Objek ini immutable.
+ */
 public class RincianNilai {
 
     private final KomponenPenilaian komponen;

@@ -4,6 +4,10 @@ import id.ac.pbo.nilai.exception.ValidasiException;
 
 import java.time.LocalDate;
 
+/**
+ * Satu baris nilai mentah yang diinput untuk seorang mahasiswa pada satu komponen.
+ * Nama mahasiswa hanya untuk tampilan (hasil join).
+ */
 public class Nilai implements Validatable {
 
     private int id;
@@ -20,10 +24,10 @@ public class Nilai implements Validatable {
     public Nilai(int id, int mahasiswaId, int komponenId, double nilai,
                  LocalDate tanggalInput, String nim, String mahasiswaNama) {
         this.id = id;
-        this.mahasiswaId = mahasiswaId;
-        this.komponenId = komponenId;
-        this.nilai = nilai;
-        this.tanggalInput = tanggalInput;
+        setMahasiswaId(mahasiswaId);
+        setKomponenId(komponenId);
+        setNilai(nilai);
+        setTanggalInput(tanggalInput);
         this.nim = nim;
         this.mahasiswaNama = mahasiswaNama;
     }
@@ -33,6 +37,9 @@ public class Nilai implements Validatable {
     }
 
     public void setId(int id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("Id nilai tidak boleh negatif.");
+        }
         this.id = id;
     }
 
@@ -41,6 +48,9 @@ public class Nilai implements Validatable {
     }
 
     public void setMahasiswaId(int mahasiswaId) {
+        if (mahasiswaId <= 0) {
+            throw new IllegalArgumentException("Mahasiswa wajib dipilih.");
+        }
         this.mahasiswaId = mahasiswaId;
     }
 
@@ -49,6 +59,9 @@ public class Nilai implements Validatable {
     }
 
     public void setKomponenId(int komponenId) {
+        if (komponenId <= 0) {
+            throw new IllegalArgumentException("Komponen penilaian wajib dipilih.");
+        }
         this.komponenId = komponenId;
     }
 
@@ -57,6 +70,9 @@ public class Nilai implements Validatable {
     }
 
     public void setNilai(double nilai) {
+        if (nilai < 0 || nilai > 100) {
+            throw new IllegalArgumentException("Nilai harus berada pada rentang 0-100.");
+        }
         this.nilai = nilai;
     }
 
@@ -65,6 +81,12 @@ public class Nilai implements Validatable {
     }
 
     public void setTanggalInput(LocalDate tanggalInput) {
+        if (tanggalInput == null) {
+            throw new IllegalArgumentException("Tanggal input wajib diisi.");
+        }
+        if (tanggalInput.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Tanggal input tidak boleh di masa depan.");
+        }
         this.tanggalInput = tanggalInput;
     }
 
@@ -86,7 +108,14 @@ public class Nilai implements Validatable {
 
     @Override
     public void validasi() throws ValidasiException {
-        throw new UnsupportedOperationException();
+        try {
+            setMahasiswaId(mahasiswaId);
+            setKomponenId(komponenId);
+            setNilai(nilai);
+            setTanggalInput(tanggalInput);
+        } catch (IllegalArgumentException e) {
+            throw new ValidasiException(e.getMessage());
+        }
     }
 
     @Override
