@@ -10,7 +10,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /**
- * Autentikasi dosen. Password disimpan sebagai hash SHA-256.
+ * Autentikasi dan manajemen akun dosen. Password disimpan sebagai hash SHA-256.
+ * Sistem hanya memiliki 1 akun admin, dan hanya admin yang dapat menambah akun dosen.
  */
 public class AuthService {
 
@@ -36,6 +37,91 @@ public class AuthService {
             throw new ValidasiException("Username atau password salah.");
         }
         return dosen;
+    }
+
+    /**
+     * Memeriksa apakah akun admin sudah terdaftar dalam sistem.
+     */
+    public boolean adaAdmin() {
+        return dosenDAO.countAdmin() > 0;
+    }
+
+    /**
+     * Menambahkan akun dosen baru oleh admin.
+     * Hanya pengguna dengan peran ADMIN yang dapat memanggil method ini.
+     *
+     * @param pemanggil Akun yang sedang login dan melakukan tindakan (harus admin).
+     * @param nama      Nama lengkap dosen.
+     * @param username  Username untuk dosen.
+     * @param password  Password polos untuk dosen.
+     * @return Dosen yang berhasil ditambahkan.
+     * @throws ValidasiException Jika bukan admin, validasi gagal, atau username duplikat.
+     */
+    public Dosen tambahDosen(Dosen pemanggil, String nama, String username, String password)
+            throws ValidasiException {
+        if (pemanggil == null || !pemanggil.isAdmin()) {
+            throw new ValidasiException("Hanya admin yang memiliki hak untuk menambah akun dosen.");
+        }
+        return daftarkanDosenInternal(nama, username, password);
+    }
+
+    /**
+     * Menambahkan akun dosen baru oleh admin dengan verifikasi konfirmasi password.
+     */
+    public Dosen tambahDosen(Dosen pemanggil, String nama, String username, String password,
+                             String konfirmasiPassword) throws ValidasiException {
+        if (pemanggil == null || !pemanggil.isAdmin()) {
+            throw new ValidasiException("Hanya admin yang memiliki hak untuk menambah akun dosen.");
+        }
+        if (password == null || !password.equals(konfirmasiPassword)) {
+            throw new ValidasiException("Konfirmasi password tidak cocok.");
+        }
+        return daftarkanDosenInternal(nama, username, password);
+    }
+
+    /**
+     * Mendaftarkan akun admin pertama dan satu-satunya.
+     * Ditolak jika akun admin sudah ada dalam sistem.
+     */
+    public Dosen inisialisasiAdmin(String nama, String username, String password) throws ValidasiException {
+        if (dosenDAO.countAdmin() >= 1) {
+            throw new ValidasiException("Hanya boleh ada 1 akun admin dalam sistem.");
+        }
+        if (password == null || password.isBlank()) {
+            throw new ValidasiException("Password admin wajib diisi.");
+        }
+        if (password.length() < 6) {
+            throw new ValidasiException("Password minimal 6 karakter.");
+        }
+        String usernameBersih = username != null ? username.trim().toLowerCase() : "admin";
+        Dosen admin = new Dosen(0, nama, usernameBersih, sha256(password), Dosen.ROLE_ADMIN);
+        admin.validasi();
+        dosenDAO.insert(admin);
+        return dosenDAO.findByUsername(admin.getUsername());
+    }
+
+    private Dosen daftarkanDosenInternal(String nama, String username, String password) throws ValidasiException {
+        if (password == null || password.isBlank()) {
+            throw new ValidasiException("Password wajib diisi.");
+        }
+        if (password.length() < 6) {
+            throw new ValidasiException("Password minimal 6 karakter.");
+        }
+
+        String usernameBersih = username != null ? username.trim().toLowerCase() : "";
+        if ("admin".equals(usernameBersih)) {
+            throw new ValidasiException("Username 'admin' dicadangkan untuk akun admin tunggal.");
+        }
+
+        if (dosenDAO.findByUsername(usernameBersih) != null) {
+            throw new ValidasiException("Username '" + usernameBersih + "' sudah digunakan.");
+        }
+
+        Dosen dosen = new Dosen(0, nama, usernameBersih, sha256(password), Dosen.ROLE_DOSEN);
+        dosen.validasi();
+
+        dosenDAO.insert(dosen);
+        return dosenDAO.findByUsername(usernameBersih);
     }
 
     public static String sha256(String teks) {

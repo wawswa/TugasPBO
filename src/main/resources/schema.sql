@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS dosen (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nama TEXT NOT NULL,
     username TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'DOSEN' CHECK (role IN ('ADMIN', 'DOSEN'))
 );
 
 CREATE TABLE IF NOT EXISTS mahasiswa (

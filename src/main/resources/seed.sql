@@ -1,7 +1,9 @@
--- Akun demo: budi / admin123 dan siti / admin123
-INSERT INTO dosen (id, nama, username, password_hash) VALUES
-(1, 'Dr. Budi Santoso, M.Kom.', 'budi', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'),
-(2, 'Siti Rahma, M.Sc.', 'siti', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9');
+-- Akun demo admin tunggal dan dosen
+-- Password semua akun demo: admin123
+INSERT INTO dosen (id, nama, username, password_hash, role) VALUES
+(1, 'Dr. Budi Santoso, M.Kom.', 'budi', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'DOSEN'),
+(2, 'Siti Rahma, M.Sc.', 'siti', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'DOSEN'),
+(3, 'Administrator', 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'ADMIN');
 
 INSERT INTO mahasiswa (id, nim, nama, jenis_kelamin, tanggal_lahir, angkatan) VALUES
 (1, '221001', 'Andi Pratama', 'L', '2003-05-14', 2022),
