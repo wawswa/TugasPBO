@@ -124,9 +124,9 @@ public class MainFrame extends JFrame {
                         + "Tugas Besar Pemrograman Berorientasi Objek Kelompok 5\n\n"
                         + "Java Swing + SQLite + pola MVC\n"
                         + "Tema: Penilaian Akademik\n\n"
-                        +"Anggota Kelompok :\n" +
-                        + "1. Rexsa Ghani Kurnianto (21120124140142)\n" +
-                        + "2. Nazkia Qolbie Dieni Anugraha (21120124140123)\n" +
+                        + "Anggota Kelompok :\n"
+                        + "1. Rexsa Ghani Kurnianto (21120124140142)\n"
+                        + "2. Nazkia Qolbie Dieni Anugraha (21120124140123)\n"
                         + "3. Kemal Fikri Aldafi (21120124130084)",
                 "Tentang Aplikasi", JOptionPane.INFORMATION_MESSAGE));
         menuBantuan.add(tentang);
