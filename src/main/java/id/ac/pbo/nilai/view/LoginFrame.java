@@ -74,7 +74,7 @@ public class LoginFrame extends JFrame {
 
         constraints.gridy = 5;
         constraints.insets = new Insets(8, 2, 2, 2);
-        JLabel petunjuk = new JLabel("Akun demo: budi / admin123", SwingConstants.CENTER);
+        JLabel petunjuk = new JLabel("Akun demo: admin / admin123 (Admin) | budi / admin123 (Dosen)", SwingConstants.CENTER);
         kartu.add(petunjuk, constraints);
 
         JPanel isi = new JPanel(new BorderLayout());

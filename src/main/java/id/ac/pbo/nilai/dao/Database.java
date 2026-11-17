@@ -41,6 +41,8 @@ public final class Database {
                 jalankanSkrip(koneksi, "/schema.sql");
                 if (hitungBaris(koneksi, "dosen") == 0) {
                     jalankanSkrip(koneksi, "/seed.sql");
+                } else {
+                    migrasikanAkunAdmin(koneksi);
                 }
             }
             siap = true;
@@ -67,6 +69,30 @@ public final class Database {
     private static void aktifkanForeignKeys(Connection koneksi) throws SQLException {
         try (Statement statement = koneksi.createStatement()) {
             statement.execute("PRAGMA foreign_keys = ON");
+        }
+    }
+
+    private static void migrasikanAkunAdmin(Connection koneksi) {
+        try (Statement statement = koneksi.createStatement()) {
+            statement.execute("ALTER TABLE dosen ADD COLUMN role TEXT NOT NULL DEFAULT 'DOSEN'");
+        } catch (SQLException ignored) {
+            // Kolom role sudah ada
+        }
+
+        try (Statement statement = koneksi.createStatement();
+             ResultSet rs = statement.executeQuery(
+                     "SELECT COUNT(*) FROM dosen WHERE UPPER(role) = 'ADMIN' OR LOWER(username) = 'admin'")) {
+            if (rs.next() && rs.getInt(1) == 0) {
+                try (var ps = koneksi.prepareStatement(
+                        "INSERT INTO dosen (nama, username, password_hash, role) VALUES (?, ?, ?, ?)")) {
+                    ps.setString(1, "Administrator");
+                    ps.setString(2, "admin");
+                    ps.setString(3, "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9");
+                    ps.setString(4, "ADMIN");
+                    ps.executeUpdate();
+                }
+            }
+        } catch (SQLException ignored) {
         }
     }
 

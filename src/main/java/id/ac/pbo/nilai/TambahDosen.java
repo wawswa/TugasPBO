@@ -1,5 +1,6 @@
 package id.ac.pbo.nilai;
 
+import id.ac.pbo.nilai.dao.Database;
 import id.ac.pbo.nilai.dao.DosenDAO;
 import id.ac.pbo.nilai.exception.DataAccessException;
 import id.ac.pbo.nilai.exception.ValidasiException;
@@ -32,17 +33,17 @@ public final class TambahDosen {
         String nama = args[0];
         String username = args[1];
         try {
+            Database.inisialisasi();
             String password = args.length == 3 ? args[2] : mintaPassword();
-            Dosen dosen = new Dosen(0, nama, username, AuthService.sha256(password));
-            dosen.validasi();
-
             DosenDAO dosenDAO = new DosenDAO();
-            if (dosenDAO.findByUsername(dosen.getUsername()) != null) {
-                System.err.println("Gagal: username '" + dosen.getUsername() + "' sudah digunakan.");
-                System.exit(2);
+            Dosen admin = dosenDAO.findAdmin();
+            if (admin == null) {
+                admin = new Dosen(0, "Administrator", "admin", "", Dosen.ROLE_ADMIN);
             }
-            dosenDAO.insert(dosen);
-            System.out.println("Akun dosen '" + dosen.getUsername() + "' berhasil ditambahkan.");
+
+            AuthService authService = new AuthService(dosenDAO);
+            Dosen dosen = authService.tambahDosen(admin, nama, username, password);
+            System.out.println("Akun dosen '" + dosen.getUsername() + "' (" + dosen.getNama() + ") berhasil ditambahkan.");
         } catch (IllegalArgumentException | ValidasiException e) {
             System.err.println("Gagal: " + e.getMessage());
             System.exit(2);

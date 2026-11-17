@@ -8,6 +8,7 @@ import id.ac.pbo.nilai.controller.NilaiController;
 import id.ac.pbo.nilai.controller.Penyegar;
 import id.ac.pbo.nilai.controller.RekapController;
 import id.ac.pbo.nilai.model.Dosen;
+import id.ac.pbo.nilai.service.AuthService;
 import id.ac.pbo.nilai.service.NilaiService;
 
 import javax.swing.BorderFactory;
@@ -40,7 +41,7 @@ public class MainFrame extends JFrame {
     private final JLabel lblStatus = new JLabel();
 
     public MainFrame(Dosen pengguna) {
-        super("Sistem Penilaian Akademik - " + pengguna.getNama());
+        super("Sistem Penilaian Akademik - " + pengguna.getNama() + (pengguna.isAdmin() ? " [ADMIN]" : ""));
         this.pengguna = pengguna;
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1150, 760);
@@ -94,6 +95,7 @@ public class MainFrame extends JFrame {
             halaman.muatUlang();
         }
         lblStatus.setText("Login sebagai: " + pengguna.getNama()
+                + (pengguna.isAdmin() ? " (ADMIN)" : " (Dosen)")
                 + "   |   Halaman: " + judulHalaman.getOrDefault(kunci, kunci));
     }
 
@@ -108,7 +110,28 @@ public class MainFrame extends JFrame {
         menuData.add(itemHalaman("Rekap Nilai", "rekap", KeyEvent.VK_5));
         menuBar.add(menuData);
 
+        if (pengguna.isAdmin()) {
+            JMenu menuAdmin = new JMenu("Admin");
+            JMenuItem itemTambahDosen = new JMenuItem("Tambah Akun Dosen");
+            itemTambahDosen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
+            itemTambahDosen.addActionListener(e -> bukaDialogTambahDosen());
+            menuAdmin.add(itemTambahDosen);
+
+            JMenuItem itemKelolaDosen = new JMenuItem("Daftar / Kelola Akun Dosen");
+            itemKelolaDosen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+            itemKelolaDosen.addActionListener(e -> bukaDialogKelolaDosen());
+            menuAdmin.add(itemKelolaDosen);
+
+            menuBar.add(menuAdmin);
+        }
+
         JMenu menuAkun = new JMenu("Akun");
+        if (pengguna.isAdmin()) {
+            JMenuItem itemTambahDosen = new JMenuItem("Tambah Akun Dosen");
+            itemTambahDosen.addActionListener(e -> bukaDialogTambahDosen());
+            menuAkun.add(itemTambahDosen);
+            menuAkun.addSeparator();
+        }
         JMenuItem logout = new JMenuItem("Logout");
         logout.addActionListener(e -> logout());
         menuAkun.add(logout);
@@ -170,5 +193,20 @@ public class MainFrame extends JFrame {
         if (jawaban == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
+    }
+
+    private void bukaDialogTambahDosen() {
+        TambahDosenDialog dialog = new TambahDosenDialog(this, pengguna, new AuthService(), () -> {
+            Penyegar aktif = penyegar.get("mataKuliah");
+            if (aktif != null) {
+                aktif.muatUlang();
+            }
+        });
+        dialog.setVisible(true);
+    }
+
+    private void bukaDialogKelolaDosen() {
+        KelolaDosenDialog dialog = new KelolaDosenDialog(this, pengguna, new AuthService());
+        dialog.setVisible(true);
     }
 }
