@@ -121,10 +121,13 @@ public class MainFrame extends JFrame {
         JMenuItem tentang = new JMenuItem("Tentang Aplikasi");
         tentang.addActionListener(e -> JOptionPane.showMessageDialog(this,
                 "Sistem Penilaian Akademik\n"
-                        + "Tugas Besar Pemrograman Berorientasi Objek\n\n"
+                        + "Tugas Besar Pemrograman Berorientasi Objek Kelompok 5\n\n"
                         + "Java Swing + SQLite + pola MVC\n"
                         + "Tema: Penilaian Akademik\n\n"
-                        + "Kelompok 3 orang",
+                        +"Anggota Kelompok :\n" +
+                        + "1. Rexsa Ghani Kurnianto (21120124140142)\n" +
+                        + "2. Nazkia Qolbie Dieni Anugraha (21120124140123)\n" +
+                        + "3. Kemal Fikri Aldafi (21120124130084)",
                 "Tentang Aplikasi", JOptionPane.INFORMATION_MESSAGE));
         menuBantuan.add(tentang);
         menuBar.add(menuBantuan);
