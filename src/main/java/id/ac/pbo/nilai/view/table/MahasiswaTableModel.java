@@ -1,0 +1,21 @@
+package id.ac.pbo.nilai.view.table;
+
+import javax.swing.table.AbstractTableModel;
+
+public class MahasiswaTableModel extends AbstractTableModel {
+
+    @Override
+    public int getRowCount() {
+        return 0;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 0;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        return null;
+    }
+}
